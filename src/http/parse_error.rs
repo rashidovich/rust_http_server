@@ -1,22 +1,7 @@
-pub use method::HttpMethod;
-use std::convert::TryFrom;
-use std::error::Error;
+use super::MethodError;
 use std::fmt::{Result as FmtResult, Display, Debug, Formatter};
-
-pub struct Request {
-    path: String,
-    query_string: Option<String>,
-    method: HttpMethod
-}
-
-impl TryFrom<&[u8]> for Request {
-    type Error = ParseError;
-
-    // GET /search?name=abc&sort=1 HTTP/1.1
-    fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
-        !unimplemented!();
-    }
-}
+use std::str::Utf8Error;
+use std::error::Error;
 
 pub enum ParseError {
     InvalidRequest,
@@ -50,16 +35,14 @@ impl Debug for ParseError {
 
 impl Error for ParseError {}
 
-pub mod method {
-    pub enum HttpMethod {
-        GET,
-        POST,
-        PUT,
-        DELETE,
-        HEAD,
-        CONNECT,
-        OPTIONS,
-        TRACE,
-        PATCH
+impl From<Utf8Error> for ParseError {
+    fn from(_: Utf8Error) -> Self {
+         Self::InvalidEncoding
+    }
+}
+
+impl From<MethodError> for ParseError {
+    fn from(_: MethodError) -> Self {
+         Self::InvalidHttpMethod
     }
 }
