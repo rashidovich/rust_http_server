@@ -1,12 +1,13 @@
 use super::HttpMethod;
 use super::ParseError;
+use super::{QueryString};
 
 //use std::convert::{TryFrom};
 use std::str;
 
 pub struct Request<'buf> {
     path: &'buf str,
-    query_string: Option<&'buf str>,
+    query_string: Option<QueryString<'buf>>,
     method: HttpMethod
 }
 
@@ -26,10 +27,10 @@ impl<'buf> TryFrom<&'buf [u8]> for Request<'buf> {
         }
 
         let method: HttpMethod = method.parse()?;
-        let mut query_string:Option<&str> = None;
+        let mut query_string:Option<QueryString<'buf>> = None;
 
         if let Some(i) = path.find('?') {
-            query_string = Some(&path[i + 1..]);
+            query_string = Some(QueryString::from(&path[i + 1..]));
             path = &path[..i];
         }
 
