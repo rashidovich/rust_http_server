@@ -5,6 +5,7 @@ use super::{QueryString};
 //use std::convert::{TryFrom};
 use std::str;
 
+#[derive(Debug)]
 pub struct Request<'buf> {
     path: &'buf str,
     query_string: Option<QueryString<'buf>>,
